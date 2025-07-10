@@ -7,7 +7,6 @@ import type {FastifyBaseLogger} from 'fastify';
 const RedirectEntrySchema = z.object({
   sourceUrl: z.string().url(),
   destinationUrl: z.string().url(),
-  statusCode: z.number().int().optional(),
 });
 
 /**
@@ -18,7 +17,6 @@ const RedirectEntrySchema = z.object({
 export async function getLatestRedirectRules(logger:FastifyBaseLogger): Promise<null | Array<{
   sourceUrl: string;
   destinationUrl: string;
-  statusCode: number;
 }>> {
   // Read the Excel file
   const fileName = join(process.cwd(), "redirects.xlsx");
@@ -48,7 +46,6 @@ export async function getLatestRedirectRules(logger:FastifyBaseLogger): Promise<
   const rules: Array<{
     sourceUrl: string;
     destinationUrl: string;
-    statusCode: number;
   }> = [];
   for (const row of rawData) {
     // Map Excel columns to our object keys
@@ -63,7 +60,6 @@ export async function getLatestRedirectRules(logger:FastifyBaseLogger): Promise<
       rules.push({
         sourceUrl: parsed.sourceUrl,
         destinationUrl: parsed.destinationUrl,
-        statusCode: parsed.statusCode || 301,
       });
     } catch (err) {
       logger.warn({err,row},"Skipping invalid Excel row");

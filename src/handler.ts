@@ -35,7 +35,7 @@ export async function handleRedirect(request: FastifyRequest, reply: FastifyRepl
   });
 
   if (match) {
-    const statusCode = match.statusCode || 301;
+    const statusCode = 301;
     request.log.info({match,statusCode},"Rule matched -redirecting");
     reply.code(statusCode).redirect(match.destinationUrl);
   } else {
