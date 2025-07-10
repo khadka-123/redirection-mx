@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { FastifyBaseLogger } from "fastify";
 import type { Mock } from "vitest";
 
-//  mocking for XLSX
 vi.mock("xlsx", async () => {
   const actual = await vi.importActual<any>("xlsx");
   return {
@@ -32,7 +31,6 @@ describe("getLatestRedirectRules", () => {
   });
 
   it("returns null when the file cannot be read", async () => {
-    // Make XLSX.readFile throw error
     (XLSX.readFile as unknown as Mock).mockImplementation(() => {
       throw new Error("ENOENT: no such file");
     });
@@ -40,14 +38,12 @@ describe("getLatestRedirectRules", () => {
     const rules = await getLatestRedirectRules(fakeLogger);
     expect(rules).toBeNull();
 
-    // Updated to match the actual implementation
     expect(fakeLogger.error).toHaveBeenCalledWith(
       expect.stringContaining("Could not read file:")
     );
   });
 
   it("throws if no sheets are present", async () => {
-    // Return a workbook with no sheets
     (XLSX.readFile as unknown as Mock).mockReturnValue({
       SheetNames: [],
       Sheets: {},
@@ -58,11 +54,10 @@ describe("getLatestRedirectRules", () => {
   });
 
   it("skips invalid rows and returns only valid rules", async () => {
-    // Build a fake worksheet with valid + invalid rows
     const ws = XLSX.utils.aoa_to_sheet([
-      ["Source URL", "Destination URL", "Status Code"],
-      ["https://a.com/one", "https://b.com/one", 301],
-      ["not-a-url",         "https://b.com/two", 302],
+      ["Source URL", "Destination URL"],
+      ["https://a.com/one", "https://b.com/one"],
+      ["not-a-url", "https://b.com/two"],
     ]);
     const fakeWb = { SheetNames: ["Sheet1"], Sheets: { Sheet1: ws } };
 
@@ -74,7 +69,6 @@ describe("getLatestRedirectRules", () => {
     expect(rules![0]).toEqual({
       sourceUrl: "https://a.com/one",
       destinationUrl: "https://b.com/one",
-      statusCode: 301,
     });
 
     expect(fakeLogger.warn).toHaveBeenCalledWith(

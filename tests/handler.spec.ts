@@ -30,22 +30,19 @@ describe("handleRedirect", () => {
   });
 
   it("redirects when a matching rule is found", async () => {
-    // getLatestRedirectRules to return one matching rule
     vi.spyOn(reader, "getLatestRedirectRules").mockResolvedValue([
       {
         sourceUrl: "https://localhost:3000/one",
         destinationUrl: "https://target.com/new",
-        statusCode: 302,
       },
     ]);
 
     await handleRedirect(fakeRequest as any, fakeReply as any);
 
-    expect(fakeReply.code).toHaveBeenCalledWith(302);
+    expect(fakeReply.code).toHaveBeenCalledWith(301); 
     expect(fakeReply.redirect).toHaveBeenCalledWith("https://target.com/new");
-    // Ensure logging occurred
     expect(fakeLog.info).toHaveBeenCalledWith(
-      expect.objectContaining({ match: expect.any(Object), statusCode: 302 }),
+      expect.objectContaining({ match: expect.any(Object), statusCode: 301 }),
       "Rule matched -redirecting"
     );
   });
@@ -55,7 +52,6 @@ describe("handleRedirect", () => {
       {
         sourceUrl: "https://localhost:3000/old",
         destinationUrl: "https://target.com/old",
-        statusCode: 301,
       },
     ]);
 

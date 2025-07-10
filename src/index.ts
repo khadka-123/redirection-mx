@@ -11,7 +11,6 @@ app.get("*", async (request, reply) => {
     reply.code(500).send("Internal Server Error");
   }
 });
-
 // Start the server
 const start = async () => {
   try {
